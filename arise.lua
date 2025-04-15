@@ -15,7 +15,7 @@ local ctrl_char = {"\a", "\b", "\f", "\n", "\r", "\t", "\v", "\z", "\0", "\1", "
 
 local folder = "Uzu"
 local name = ("%*- %* Arise Dungeon.lua"):format(player.UserId, game.GameId)
-local path = ("%*\\%*"):format(folder, name)
+local path = ("%*/%*"):format(folder, name)
 
 repeat task.wait() until player:GetAttribute("Loaded") and workspace.__Extra:FindFirstChild("__Spawns")
 
