@@ -1,5 +1,9 @@
 getgenv().config = {}
 
+if uzu_auto_execute then
+    queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/uzu/refs/heads/main/arise.lua"))()')
+end
+
 local players = game:GetService("Players")
 local http_service = game:GetService("HttpService")
 local replicated_storage = game:GetService("ReplicatedStorage")
