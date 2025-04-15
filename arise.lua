@@ -1,9 +1,5 @@
 getgenv().config = {}
 
-if uzu_auto_execute then
-    queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/uzu/refs/heads/main/arise.lua"))()')
-end
-
 local players = game:GetService("Players")
 local http_service = game:GetService("HttpService")
 local replicated_storage = game:GetService("ReplicatedStorage")
@@ -109,6 +105,14 @@ main_folder:AddToggle({text = "Auto Dungeon", state = config.auto_dungeon, callb
     save()
 
     task.spawn(auto_dungeon)
+end})
+
+misc_folder:AddToggle({text = "Auto Execute", state = config.auto_execute, callback = function(v)
+    config.auto_execute = v
+    save()
+
+    if not v then return end
+    queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/uzu/refs/heads/main/arise.lua"))()')
 end})
 
 misc_folder:AddBind({text = "Toggle GUI", key = "LeftControl", callback = function() 
