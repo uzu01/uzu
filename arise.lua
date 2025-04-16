@@ -59,6 +59,24 @@ function get_nearest_mob()
     return target
 end
 
+function get_weapons()
+    local weapons = {}
+
+    for i, v in player.leaderstats.Inventory.Weapons:GetChildren() do
+        local weapon_name = v:GetAttribute("Name")
+        local weapon_rank = v:GetAttribute("Level")
+
+        if v:GetAttribute("Locked") then continue end
+        if player.leaderstats.Equips:GetAttribute("Weapon") == v.Name then continue end
+        if weapon_name == "DualCrystalSword" then continue end
+
+        weapons[weapon_name] = weapons[weapon_name] or {}
+        weapons[weapon_name][weapon_rank] = weapons[weapon_name][weapon_rank] or {}
+        table.insert(weapons[weapon_name][weapon_rank], v.Name)
+    end
+    return weapons
+end
+
 function replay_dungeon()
     local ticket_amount = player.leaderstats.Inventory.Items.Ticket:GetAttribute("Amount")
     getgenv().old_ticket = old_ticket or ticket_amount
@@ -91,6 +109,21 @@ function auto_dungeon()
     end
 end
 
+function auto_upgrade_weapon()
+    while task.wait() and config.auto_upgrade_weapon do
+        local weapon_table = get_weapons()
+    
+        for weapon, v in weapon_table do
+            for rank, v2 in v do
+                if #v2 < 3 then continue end
+                if rank == 7 then continue end
+                data_remote_event:FireServer({{Type=weapon, BuyType="Gems", Weapons={v2[1], v2[2], v2[3]}, Event="UpgradeWeapon", Level=rank + 1}, "\n"})
+                task.wait()
+            end
+        end
+    end
+end
+
 task.wait(.1)
 load()
 
@@ -105,6 +138,13 @@ main_folder:AddToggle({text = "Auto Dungeon", state = config.auto_dungeon, callb
     save()
 
     task.spawn(auto_dungeon)
+end})
+
+misc_folder:AddToggle({text = "Auto Upgrade Weapon", state = config.auto_upgrade_weapon, callback = function(v)
+    config.auto_upgrade_weapon = v
+    save()
+
+    task.spawn(auto_upgrade_weapon)
 end})
 
 misc_folder:AddToggle({text = "Auto Execute", state = config.auto_execute, callback = function(v)
