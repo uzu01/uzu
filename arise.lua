@@ -103,7 +103,7 @@ function auto_dungeon()
         
         if get_distance(mob:GetPivot().p) > 10 then
             teleport(mob:GetPivot() * CFrame.new(0, 2, 0.1))
-            task.wait(0.5)
+            task.wait(config.speed)
         end
 
         data_remote_event:FireServer({{Event = "PunchAttack", Enemy = mob.Name}, "\4"})
@@ -139,6 +139,11 @@ main_folder:AddToggle({text = "Auto Dungeon", state = config.auto_dungeon, callb
     save()
 
     task.spawn(auto_dungeon)
+end})
+
+main_folder:AddSlider({text = "Speed", value = config.speed or .5, min = 0, max = 1, float = .1, callback = function(v)
+    config.speed = v
+    save()
 end})
 
 misc_folder:AddToggle({text = "Auto Upgrade Weapon", state = config.auto_upgrade_weapon, callback = function(v)
