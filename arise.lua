@@ -78,8 +78,9 @@ function get_weapons()
 end
 
 function replay_dungeon()
-    local ticket_amount = player.leaderstats.Inventory.Items.Ticket:GetAttribute("Amount")
-    getgenv().old_ticket = old_ticket or ticket_amount
+    local ticket = player.leaderstats.Inventory.Items:FindFirstChild("Ticket")
+    local ticket_amount = ticket and ticket:GetAttribute("Amount")
+    getgenv().old_ticket = old_ticket or ticket_amount or 0
 
     if old_ticket ~= ticket_amount or not replicated_storage:GetAttribute("Dungeon") then
         for i, v in ctrl_char do
