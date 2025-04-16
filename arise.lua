@@ -10,7 +10,7 @@ local data_remote_event = replicated_storage.BridgeNet2.dataRemoteEvent
 local ctrl_char = {"\a", "\b", "\f", "\n", "\r", "\t", "\v", "\z", "\0", "\1", "\2", "\3", "\4", "\5", "\6", "\7", "\8", "\9"}
 
 local folder = "Uzu"
-local name = ("%* - %* Arise Test.lua"):format(player.UserId, game.GameId)
+local name = ("%*- %* Arise Dungeon.lua"):format(player.UserId, game.GameId)
 local path = ("%*/%*"):format(folder, name)
 
 repeat task.wait() until player:GetAttribute("Loaded") and workspace.__Extra:FindFirstChild("__Spawns")
