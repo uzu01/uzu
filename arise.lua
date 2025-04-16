@@ -10,7 +10,7 @@ local data_remote_event = replicated_storage.BridgeNet2.dataRemoteEvent
 local ctrl_char = {"\a", "\b", "\f", "\n", "\r", "\t", "\v", "\z", "\0", "\1", "\2", "\3", "\4", "\5", "\6", "\7", "\8", "\9"}
 
 local folder = "Uzu"
-local name = ("%*- %* Arise Dungeon.lua"):format(player.UserId, game.GameId)
+local name = ("%* - %* Arise Test.lua"):format(player.UserId, game.GameId)
 local path = ("%*/%*"):format(folder, name)
 
 repeat task.wait() until player:GetAttribute("Loaded") and workspace.__Extra:FindFirstChild("__Spawns")
@@ -33,10 +33,6 @@ function teleport(position)
     character:PivotTo(position)
 end
 
-function get_distance(position)
-    return player.Character and player:DistanceFromCharacter(position) or math.huge
-end
-
 function float()
     local character = player.Character
     local root_part = character and character:FindFirstChild("HumanoidRootPart")
@@ -44,19 +40,20 @@ function float()
     root_part.Velocity = Vector3.zero
 end
 
-function get_nearest_mob()
-    local dist = math.huge
-    local target = nil
+function get_distance(position)
+    return player.Character and player:DistanceFromCharacter(position) or math.huge
+end
 
-    for i, v in workspace.__Main.__Enemies.Server:GetDescendants() do
-        local mag = v:IsA("Part") and not v:GetAttribute("Dead") and get_distance(v:GetPivot().p)
-
-        if mag and mag < dist then
-            dist = mag
-            target = v
-        end
+function get_runes()
+    local runes = {}
+    
+    for i, v in player.leaderstats.Inventory.Items:GetChildren() do
+        if not v.Name:match("Rune") then continue end
+        if v:GetAttribute("Amount") == 0 then continue end
+        table.insert(runes, v.Name)
     end
-    return target
+    table.sort(runes)
+    return runes
 end
 
 function get_weapons()
@@ -77,6 +74,21 @@ function get_weapons()
     return weapons
 end
 
+function get_nearest_mob()
+    local dist = math.huge
+    local target = nil
+
+    for i, v in workspace.__Main.__Enemies.Server:GetDescendants() do
+        local mag = v:IsA("Part") and not v:GetAttribute("Dead") and get_distance(v:GetPivot().p)
+
+        if mag and mag < dist then
+            dist = mag
+            target = v
+        end
+    end
+    return target
+end
+
 function replay_dungeon()
     local ticket = player.leaderstats.Inventory.Items:FindFirstChild("Ticket")
     local ticket_amount = ticket and ticket:GetAttribute("Amount")
@@ -86,9 +98,15 @@ function replay_dungeon()
         for i, v in ctrl_char do
             data_remote_event:FireServer({{Type = "Gems", Event = "DungeonAction", Action = "BuyTicket"}, v})
             data_remote_event:FireServer({{Event = "DungeonAction", Action = "Create"}, v})
+
+            if config.use_rune and config.selected_rune then
+                data_remote_event:FireServer({{Dungeon = player.UserId, Action = "AddItems", Slot = 1, Event = "DungeonAction", Item = config.selected_rune}, v})
+                task.wait(.1)
+            end
+
             data_remote_event:FireServer({{Dungeon = player.UserId, Event = "DungeonAction", Action = "Start"}, v})
         end
-        task.wait(60)
+        task.wait(10)
     end
 end
 
@@ -141,7 +159,17 @@ main_folder:AddToggle({text = "Auto Dungeon", state = config.auto_dungeon, callb
     task.spawn(auto_dungeon)
 end})
 
-main_folder:AddSlider({text = "Speed", value = config.speed or .5, min = 0, max = 1, float = .1, callback = function(v)
+main_folder:AddToggle({text = "Use Rune", state = config.use_rune, callback = function(v)
+    config.use_rune = v
+    save()
+end})
+
+main_folder:AddList({text = "Select Rune", value = config.selected_rune, values = get_runes(), callback = function(v)
+    config.selected_rune = v
+    save()
+end})
+
+main_folder:AddSlider({text = "Kill Cooldown", value = config.speed or .5, min = 0, max = 1, float = .1, callback = function(v)
     config.speed = v
     save()
 end})
