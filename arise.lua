@@ -1,6 +1,7 @@
 getgenv().config = {}
 
 local players = game:GetService("Players")
+local virtual_user = game:GetService("VirtualUser")
 local http_service = game:GetService("HttpService")
 local replicated_storage = game:GetService("ReplicatedStorage")
 
@@ -12,6 +13,11 @@ local ctrl_char = {"\a", "\b", "\f", "\n", "\r", "\t", "\v", "\z", "\0", "\1", "
 local folder = "Uzu"
 local name = ("%*- %* Arise Dungeon.lua"):format(player.UserId, game.GameId)
 local path = ("%*/%*"):format(folder, name)
+
+player.Idled:Connect(function()
+    virtual_user:CaptureController()
+    virtual_user:ClickButton2(Vector2.new())
+end)
 
 repeat task.wait() until player:GetAttribute("Loaded") and workspace.__Extra:FindFirstChild("__Spawns")
 
